@@ -33,9 +33,13 @@ class Timer(object):
             'org.freedesktop.systemd1',
             unit_path,)
 
-        self.__interface = dbus.Interface(
+        self.__interface_timer = dbus.Interface(
             self.__proxy,
             'org.freedesktop.systemd1.Timer',)
+
+        self.__interface_unit = dbus.Interface(
+            self.__proxy,
+            'org.freedesktop.systemd1.Unit',)
 
         self.__properties_interface = dbus.Interface(
             self.__proxy,
@@ -51,9 +55,13 @@ class Timer(object):
         self.__properties()
 
     def __properties(self):
-        properties = self.__properties_interface.GetAll(
-            self.__interface.dbus_interface)
-        attr_property =  Property()
+        properties_unit = self.__properties_interface.GetAll(
+            self.__interface_unit.dbus_interface)
+        properties_timer = self.__properties_interface.GetAll(
+            self.__interface_timer.dbus_interface)
+        attr_property = Property()
+        properties = properties_unit.copy()
+        properties.update(properties_timer)
         for key, value in properties.items():
             setattr(attr_property, key, value)
         setattr(self, 'properties', attr_property)

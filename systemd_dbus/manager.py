@@ -22,6 +22,7 @@ import dbus.mainloop.glib
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
 from systemd_dbus.unit import Unit
+from systemd_dbus.timer import Timer
 from systemd_dbus.job import Job
 from systemd_dbus.property import Property
 from systemd_dbus.exceptions import SystemdError
@@ -178,6 +179,27 @@ class Manager(object):
             for job in self.__interface.ListJobs():
                 jobs.append(Job(job[4]))
             return tuple(jobs)
+        except dbus.exceptions.DBusException as error:
+            raise SystemdError(error)
+
+    def list_timers(self):
+        """List all timers, inactive units too.
+
+        @raise SystemdError: Raised when dbus error or index error
+        is raised.
+
+        @rtype: A tuple of L{systemd_dbus.timer.Timer}
+        """
+        try:
+            timers = []
+            for timer in self.__interface.ListUnits():
+                try:
+                    timers.append(Timer(timer[6]))
+                except dbus.exceptions.DBusException as error:
+                    if (error._dbus_error_name !=
+                            'org.freedesktop.DBus.Error.UnknownInterface'):
+                        raise SystemdError(error)
+            return tuple(timers)
         except dbus.exceptions.DBusException as error:
             raise SystemdError(error)
 
