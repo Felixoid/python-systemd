@@ -24,6 +24,7 @@ dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 from systemd_dbus.property import Property
 from systemd_dbus.exceptions import SystemdError
 
+
 class Timer(object):
     """Abstraction class to org.freedesktop.systemd1.Timer interface"""
     def __init__(self, unit_path):
