@@ -1,4 +1,7 @@
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 import os
 
 from systemd_dbus import get_version
@@ -14,14 +17,15 @@ if root_dir:
 for dirpath, dirnames, filenames in os.walk('systemd_dbus'):
     # Ignore dirnames that start with '.'
     for i, dirname in enumerate(dirnames):
-        if dirname.startswith('.'): del dirnames[i]
+        if dirname.startswith('.'):
+            del dirnames[i]
     if '__init__.py' in filenames:
         pkg = dirpath.replace(os.path.sep, '.')
         if os.path.altsep:
             pkg = pkg.replace(os.path.altsep, '.')
         packages.append(pkg)
     elif filenames:
-        prefix = dirpath[13:] # Strip "systemd/" or "systemd\"
+        prefix = dirpath[13:]  # Strip "systemd/" or "systemd\"
         for f in filenames:
             data_files.append(os.path.join(prefix, f))
 
@@ -34,13 +38,14 @@ setup(name='python-systemd-dbus',
       url='',
       download_url='',
       package_dir={'systemd_dbus': 'systemd_dbus'},
+      install_requires=['dbus-python'],
       packages=packages,
       package_data={'systemd_dbus': data_files},
       classifiers=['Development Status :: 1 - Planning',
                    'Intended Audience :: Developers',
                    'License :: ',
-		           'Operating System :: POSIX :: Linux',
+                   'Operating System :: POSIX :: Linux',
                    'Programming Language :: Python',
-                   'Topic :: Libraries :: Python Modules',]
+                   'Topic :: Libraries :: Python Modules',
+                   ]
       )
-
